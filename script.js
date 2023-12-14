@@ -38,6 +38,7 @@ const account5 = {
 };
 
 const accounts = [account1, account2, account3, account4, account5];
+let currentAccount;
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -66,6 +67,7 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 
+// FUNCTION
 const displayTransactions = function (transaction) {
 
   containerTransactions.innerHTML = '';
@@ -122,11 +124,11 @@ const displayTotals = function (acc) {
 
 };
 
-createNickNames(accounts);
 
+// EVENTS
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
-  const currentAccount = accounts.find(acc => acc.nickName === inputLoginUsername.value);
+  currentAccount = accounts.find(acc => acc.nickName === inputLoginUsername.value);
   if (currentAccount?.pin === Number(inputLoginPin.value)) {
 
     labelWelcome.textContent = `Рады, что вы снова с нами, ${currentAccount.userName.split(' ')[0]} !`
@@ -143,5 +145,24 @@ btnLogin.addEventListener('click', function (e) {
   }
 });
 
+btnClose.addEventListener('click', function (e) {
 
+  e.preventDefault();
+
+  if (currentAccount.nickName === inputCloseUsername.value &&
+    currentAccount.pin === Number(inputClosePin.value)) {
+
+    const accIndex = accounts.findIndex(acc => acc.nickName === currentAccount.nickName);
+    accounts.splice(accIndex, 1);
+
+    labelWelcome.textContent = `Войдите в свой аккаунт`;
+    containerApp.style.opacity = 0;
+    inputCloseUsername.value = '';
+    inputClosePin.value = '';
+  }
+});
+
+
+// CALLS
+createNickNames(accounts);
 
