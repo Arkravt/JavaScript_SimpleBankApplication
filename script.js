@@ -122,7 +122,26 @@ const displayTotals = function (acc) {
 
 };
 
-displayTransactions(account1.transactions);
 createNickNames(accounts);
-displayBalance(account1.transactions);
-displayTotals(account1);
+
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  const currentAccount = accounts.find(acc => acc.nickName === inputLoginUsername.value);
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+
+    labelWelcome.textContent = `Рады, что вы снова с нами, ${currentAccount.userName.split(' ')[0]} !`
+
+    containerApp.style.opacity = 100;
+
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    displayTransactions(currentAccount.transactions);
+    displayBalance(currentAccount.transactions);
+    displayTotals(currentAccount);
+  }
+});
+
+
+
