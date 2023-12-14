@@ -99,6 +99,30 @@ const displayBalance = function (trans) {
   labelBalance.textContent = `${balance}$`;
 };
 
+const displayTotals = function (acc) {
+
+  const transactions = acc.transactions;
+  const interest = acc.interest;
+
+  const depositTotal = transactions
+    .filter(trans => trans > 0)
+    .reduce((acc, deposit) => acc += deposit, 0);
+  labelSumIn.textContent = `${depositTotal}$`;
+
+  const withdrawalTotal = transactions
+    .filter(trans => trans < 0)
+    .reduce((acc, withdrawal) => acc += withdrawal, 0);
+  labelSumOut.textContent = `${withdrawalTotal}$`;
+
+  const interestTotal = transactions
+    .filter(depo => depo > 0)
+    .map(depo => depo * interest / 100)
+    .reduce((acc, interest) => acc += interest, 0);
+  labelSumInterest.textContent = `${interestTotal.toFixed(2)}$`;
+
+};
+
 displayTransactions(account1.transactions);
 createNickNames(accounts);
 displayBalance(account1.transactions);
+displayTotals(account1);
