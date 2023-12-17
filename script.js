@@ -39,6 +39,7 @@ const account5 = {
 
 const accounts = [account1, account2, account3, account4, account5];
 let currentAccount;
+let transactionsSorted = false;
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -68,11 +69,13 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 
 // FUNCTION
-const displayTransactions = function (transaction) {
+const displayTransactions = function (transactions, sort = false) {
 
   containerTransactions.innerHTML = '';
 
-  transaction.forEach(function (trans, index) {
+  const transacs = sort ? transactions.slice().sort((x, y) => x - y) : transactions;
+
+  transacs.forEach(function (trans, index) {
     let transType = trans > 0 ? 'deposit' : 'withdrawal';
     let transactionRow = `
     <div class="transactions__row">
@@ -97,7 +100,7 @@ const createNickNames = function (accs) {
 };
 
 const displayBalance = function (account) {
-  const balance = account.trans.reduce((acc, amount) => acc + amount, 0);
+  const balance = account.transactions.reduce((acc, amount) => acc + amount, 0);
   labelBalance.textContent = `${balance}$`;
 
   account.balance = Number(balance);
@@ -138,6 +141,7 @@ const updateUi = function (account) {
 
 // EVENTS
 btnLogin.addEventListener('click', function (e) {
+
   e.preventDefault();
   currentAccount = accounts.find(acc => acc.nickName === inputLoginUsername.value);
   if (currentAccount?.pin === Number(inputLoginPin.value)) {
@@ -186,7 +190,7 @@ btnTransfer.addEventListener('click', function (e) {
 
     recipient.transactions.push(transferAmount);
     currentAccount.transactions.push(-transferAmount);
- 
+
     inputTransferAmount.value = '';
     inputTransferTo.value = '';
 
@@ -194,6 +198,25 @@ btnTransfer.addEventListener('click', function (e) {
   }
 });
 
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const loanAmount = Number(inputLoanAmount.value);
+  if (loanAmount > 0 && currentAccount.transactions.some(trans => trans >= loanAmount * 10 / 100)) {
+    currentAccount.transactions.push(loanAmount);
+    updateUi(currentAccount);
+  }
+
+  inputLoanAmount.value = '';
+
+});
+
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  displayTransactions(currentAccount.transactions, !transactionsSorted);
+  transactionsSorted = !transactionsSorted;
+});
 
 // CALLS
 createNickNames(accounts);
