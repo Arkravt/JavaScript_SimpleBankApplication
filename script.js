@@ -18,7 +18,7 @@ const account1 = {
     '2021-06-22T15:21:20.814Z',
   ],
   currency: 'USD',
-  locale: 'en-US',
+  locale: 'ru-RU',
 };
 
 const account2 = {
@@ -132,7 +132,7 @@ const displayTransactions = function (account, sort = false) {
   transacs.forEach(function (trans, index) {
     let transType = trans > 0 ? 'deposit' : 'withdrawal';
 
-    let transDate = getTransactionDate(new Date(account.transactionsDates[index]));
+    let transDate = getTransactionDate(new Date(account.transactionsDates[index]), account.locale);
 
     let transactionRow = `
     <div class="transactions__row">
@@ -196,16 +196,18 @@ const updateUi = function (account) {
 
 };
 
-const getFormatedDate = function (dateToFormat) {
+const getFormatedDate = function (dateToFormat, locale, options = {}) {
 
-  const day = `${dateToFormat.getDate()}`.padStart(2, '0');
-  const month = `${dateToFormat.getMonth() + 1}`.padStart(2, '0');
-  const year = `${dateToFormat.getFullYear()}`;
+  // const day = `${dateToFormat.getDate()}`.padStart(2, '0');
+  // const month = `${dateToFormat.getMonth() + 1}`.padStart(2, '0');
+  // const year = `${dateToFormat.getFullYear()}`;
 
-  return `${day}/${month}/${year}`;
+  // return `${day}/${month}/${year}`;
+
+  return Intl.DateTimeFormat(locale, options).format(dateToFormat);
 };
 
-const getTransactionDate = function (transactionDate) {
+const getTransactionDate = function (transactionDate, locale) {
 
   const getPassedDays = (date1, date2) => Math.round(Math.abs(date1 - date2) / (1000 * 24 * 60 * 60));
 
@@ -218,7 +220,7 @@ const getTransactionDate = function (transactionDate) {
   if (daysPassed <= 5) {
     return `${daysPassed} дня назад`
   } else {
-    return getFormatedDate(transactionDate);
+    return getFormatedDate(transactionDate, locale);
   };
 
 };
@@ -235,7 +237,16 @@ btnLogin.addEventListener('click', function (e) {
 
     containerApp.style.opacity = 100;
 
-    labelDate.textContent = getFormatedDate(new Date());
+    const dateOptions = {
+      hour: 'numeric',
+      minute: 'numeric',
+      day: 'numeric',
+      month: '2-digit',
+      year: 'numeric',
+      weekday: 'long',
+    }
+
+    labelDate.textContent = getFormatedDate(new Date(), currentAccount.locale, dateOptions);
 
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
