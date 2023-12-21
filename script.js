@@ -17,7 +17,7 @@ const account1 = {
     '2021-05-21T07:43:59.331Z',
     '2021-06-22T15:21:20.814Z',
   ],
-  currency: 'USD',
+  currency: 'RUB',
   locale: 'ru-RU',
 };
 
@@ -131,8 +131,11 @@ const displayTransactions = function (account, sort = false) {
 
   transacs.forEach(function (trans, index) {
     let transType = trans > 0 ? 'deposit' : 'withdrawal';
-
     let transDate = getTransactionDate(new Date(account.transactionsDates[index]), account.locale);
+    let formatedTrans = formatCurrency(
+      trans,
+      account.locale,
+      account.currency);
 
     let transactionRow = `
     <div class="transactions__row">
@@ -140,7 +143,7 @@ const displayTransactions = function (account, sort = false) {
       ${index + 1} ${transType}
     </div>
     <div class="transactions__date">${transDate}</div>
-    <div class="transactions__value">${trans.toFixed(2)}$</div>
+    <div class="transactions__value">${formatedTrans}</div>
     </div>`;
 
     containerTransactions.insertAdjacentHTML('afterbegin', transactionRow);
@@ -159,10 +162,13 @@ const createNickNames = function (accs) {
 
 const displayBalance = function (account) {
   const balance = account.transactions.reduce((acc, amount) => acc + amount, 0);
-  labelBalance.textContent = `${balance.toFixed(2)}$`;
 
-  account.balance = +balance;
+  account.balance = balance;
 
+  labelBalance.textContent = formatCurrency(
+    balance,
+    account.locale,
+    account.currency);
 };
 
 const displayTotals = function (acc) {
@@ -173,18 +179,30 @@ const displayTotals = function (acc) {
   const depositTotal = transactions
     .filter(trans => trans > 0)
     .reduce((acc, deposit) => acc += deposit, 0);
-  labelSumIn.textContent = `${depositTotal.toFixed(2)}$`;
+
+  labelSumIn.textContent = formatCurrency(
+    depositTotal,
+    acc.locale,
+    acc.currency);
 
   const withdrawalTotal = transactions
     .filter(trans => trans < 0)
     .reduce((acc, withdrawal) => acc += withdrawal, 0);
-  labelSumOut.textContent = `${withdrawalTotal.toFixed(2)}$`;
+
+  labelSumOut.textContent = formatCurrency(
+    withdrawalTotal,
+    acc.locale,
+    acc.currency);
 
   const interestTotal = transactions
     .filter(depo => depo > 0)
     .map(depo => depo * interest / 100)
     .reduce((acc, interest) => acc += interest, 0);
-  labelSumInterest.textContent = `${interestTotal.toFixed(2)}$`;
+
+  labelSumInterest.textContent = formatCurrency(
+    interestTotal,
+    acc.locale,
+    acc.currency);
 
 };
 
@@ -225,6 +243,12 @@ const getTransactionDate = function (transactionDate, locale) {
 
 };
 
+const formatCurrency = function (value, locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency
+  }).format(value);
+};
 
 // EVENTS
 btnLogin.addEventListener('click', function (e) {
