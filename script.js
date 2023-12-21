@@ -8,9 +8,9 @@ const account1 = {
   interest: 1.5,
   pin: 1111,
   transactionsDates: [
-    '2020-10-02T14:43:31.074Z',
-    '2020-10-29T11:24:19.761Z',
-    '2020-11-15T10:45:23.907Z',
+    '2023-12-20T14:43:31.074Z',
+    '2023-12-19T11:24:19.761Z',
+    '2023-12-17T10:45:23.907Z',
     '2021-01-22T12:17:46.255Z',
     '2021-02-12T15:14:06.486Z',
     '2021-03-09T11:42:26.371Z',
@@ -132,7 +132,7 @@ const displayTransactions = function (account, sort = false) {
   transacs.forEach(function (trans, index) {
     let transType = trans > 0 ? 'deposit' : 'withdrawal';
 
-    let transDate = getFormatedDate(account.transactionsDates[index]);
+    let transDate = getTransactionDate(new Date(account.transactionsDates[index]));
 
     let transactionRow = `
     <div class="transactions__row">
@@ -198,16 +198,31 @@ const updateUi = function (account) {
 
 const getFormatedDate = function (dateToFormat) {
 
-  if (typeof dateToFormat !== Date) {
-    dateToFormat = new Date(dateToFormat);
-  }
-
   const day = `${dateToFormat.getDate()}`.padStart(2, '0');
   const month = `${dateToFormat.getMonth() + 1}`.padStart(2, '0');
   const year = `${dateToFormat.getFullYear()}`;
 
   return `${day}/${month}/${year}`;
-}
+};
+
+const getTransactionDate = function (transactionDate) {
+
+  const getPassedDays = (date1, date2) => Math.round(Math.abs(date1 - date2) / (1000 * 24 * 60 * 60));
+
+  const daysPassed = getPassedDays(new Date(), transactionDate);
+
+  if (daysPassed === 0) return `Сегодня`;
+
+  if (daysPassed === 1) return `Вчера`;
+
+  if (daysPassed <= 5) {
+    return `${daysPassed} дня назад`
+  } else {
+    return getFormatedDate(transactionDate);
+  };
+
+};
+
 
 // EVENTS
 btnLogin.addEventListener('click', function (e) {
@@ -293,6 +308,7 @@ btnSort.addEventListener('click', function (e) {
   displayTransactions(currentAccount, !transactionsSorted);
   transactionsSorted = !transactionsSorted;
 });
+
 
 // CALLS
 createNickNames(accounts);
