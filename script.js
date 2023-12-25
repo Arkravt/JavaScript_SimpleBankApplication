@@ -1,7 +1,6 @@
 'use strict';
 
 // Simply Bank App
-
 const account1 = {
   userName: 'Cecil Ireland',
   transactions: [500, 250, -300, 5000, -850, -110, -170, 1100],
@@ -91,9 +90,11 @@ const account5 = {
   locale: 'en-US',
 };
 
+
 const accounts = [account1, account2, account3, account4, account5];
 let currentAccount;
 let transactionsSorted = false;
+let currentTimer;
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -250,6 +251,35 @@ const formatCurrency = function (value, locale, currency) {
   }).format(value);
 };
 
+const startTimeOut = function () {
+
+  const startTimeOutCallBack = function () {
+
+    let min = `${Math.trunc(timeOut / 60)}`.padStart(2, '0');
+    let sec = `${Math.floor(timeOut % 60)}`.padStart(2, '0');
+
+    if (timeOut <= 0) {
+      clearInterval(currentTimer);
+      containerApp.style.opacity = 0;
+      labelWelcome.textContent = `Войдите в свой аккаунт`;
+    }
+    labelTimer.textContent = `${min}:${sec}`;
+
+    timeOut--;
+
+  };
+
+  let timeOut = 300;
+
+  if (currentTimer) {
+    clearInterval(currentTimer);
+  }
+
+  startTimeOutCallBack();
+  currentTimer = setInterval(startTimeOutCallBack, 1000);
+};
+
+
 // EVENTS
 btnLogin.addEventListener('click', function (e) {
 
@@ -276,8 +306,9 @@ btnLogin.addEventListener('click', function (e) {
     inputLoginPin.value = '';
     inputLoginPin.blur();
 
-    updateUi(currentAccount);
+    startTimeOut();
 
+    updateUi(currentAccount);
   }
 });
 
@@ -320,6 +351,8 @@ btnTransfer.addEventListener('click', function (e) {
     inputTransferTo.value = '';
 
     updateUi(currentAccount);
+
+    startTimeOut();
   }
 });
 
@@ -335,6 +368,8 @@ btnLoan.addEventListener('click', function (e) {
 
   inputLoanAmount.value = '';
 
+  startTimeOut();
+
 });
 
 btnSort.addEventListener('click', function (e) {
@@ -347,4 +382,6 @@ btnSort.addEventListener('click', function (e) {
 
 // CALLS
 createNickNames(accounts);
+
+
 
